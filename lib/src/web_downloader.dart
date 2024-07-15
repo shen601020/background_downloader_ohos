@@ -14,7 +14,7 @@ import 'task.dart';
 /// and it does not compile for Web. This stub prevents that compilation error,
 /// but it is not an actual implementation for the Web.
 
-final class DesktopDownloader extends BaseDownloader {
+ class DesktopDownloader extends BaseDownloader {
   static var httpClient = http.Client();
   static Duration? requestTimeout;
   static var proxy = <String, dynamic>{}; // 'address' and 'port'

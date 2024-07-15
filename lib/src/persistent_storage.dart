@@ -22,7 +22,7 @@ import 'task.dart';
 /// fromJson (use .createFromJson for [Task] objects)
 ///
 /// Also defined methods to allow migration from one database version to another
-abstract interface class PersistentStorage {
+abstract class PersistentStorage {
   /// Store a [TaskRecord], keyed by taskId
   Future<void> storeTaskRecord(TaskRecord record);
 
@@ -99,8 +99,8 @@ class LocalStorePersistentStorage implements PersistentStorage {
 
   /// Returns [document] stored in [collection] under key [identifier]
   /// as a [Map<String, dynamic>], or null if not found
-  Future<Map<String, dynamic>?> retrieve(
-          String collection, String identifier) =>
+  Future<Map<String, dynamic>?> retrieve(String collection,
+      String identifier) =>
       _db.collection(collection).doc(identifier).get();
 
   /// Returns all documents in collection as a [Map<String, dynamic>] keyed by the
@@ -166,27 +166,33 @@ class LocalStorePersistentStorage implements PersistentStorage {
 
   @override
   Future<Task?> retrievePausedTask(String taskId) async {
-    return switch (await retrieve(pausedTasksPath, _safeId(taskId))) {
-      var json? => Task.createFromJson(json),
-      _ => null
-    };
+    final data = await retrieve(pausedTasksPath, _safeId(taskId));
+    if (data != null) {
+      return Task.createFromJson(data);
+    }
+    return null;
   }
+
 
   @override
   Future<ResumeData?> retrieveResumeData(String taskId) async {
-    return switch (await retrieve(resumeDataPath, _safeId(taskId))) {
-      var json? => ResumeData.fromJson(json),
-      _ => null
-    };
+    final data = await retrieve(resumeDataPath, _safeId(taskId));
+    if (data != null) {
+      return ResumeData.fromJson(data);
+    }
+    return null;
   }
+
 
   @override
   Future<TaskRecord?> retrieveTaskRecord(String taskId) async {
-    return switch (await retrieve(taskRecordsPath, _safeId(taskId))) {
-      var json? => TaskRecord.fromJson(json),
-      _ => null
-    };
+    final data = await retrieve(taskRecordsPath, _safeId(taskId));
+    if (data != null) {
+      return TaskRecord.fromJson(data);
+    }
+    return null;
   }
+
 
   @override
   Future<void> storePausedTask(Task task) =>
@@ -203,17 +209,23 @@ class LocalStorePersistentStorage implements PersistentStorage {
   @override
   Future<(String, int)> get storedDatabaseVersion async {
     final metaData =
-        await _db.collection(metaDataCollection).doc('metaData').get();
+    await _db.collection(metaDataCollection).doc('metaData').get();
     return ('Localstore', (metaData?['version'] as num?)?.toInt() ?? 0);
   }
 
   @override
-  (String, int) get currentDatabaseVersion => ('Localstore', 1);
+  get currentDatabaseVersion => const ('Localstore', 1);
 
   @override
   Future<void> initialize() async {
-    final (currentName, currentVersion) = currentDatabaseVersion;
-    final (storedName, storedVersion) = await storedDatabaseVersion;
+    // 使用临时变量来存储数组的元素
+    final String currentName = currentDatabaseVersion.$0;
+    final int currentVersion = currentDatabaseVersion.$1;
+
+    final storedDatabaseVersionList = await storedDatabaseVersion;
+    final String storedName = storedDatabaseVersionList.$0;
+    final int storedVersion = storedDatabaseVersionList.$1;
+
     if (storedName != currentName) {
       log.warning('Cannot migrate from database name $storedName');
       return;
@@ -223,9 +235,10 @@ class LocalStorePersistentStorage implements PersistentStorage {
     }
     log.fine(
         'Migrating $currentName database from version $storedVersion to $currentVersion');
+
     switch (storedVersion) {
       case 0:
-        // move files from docDir to supportDir
+      // move files from docDir to supportDir
         final docDir = await getApplicationDocumentsDirectory();
         final supportDir = await getApplicationSupportDirectory();
         for (String path in [
@@ -250,6 +263,7 @@ class LocalStorePersistentStorage implements PersistentStorage {
             log.fine('Error migrating database for path $path: $e');
           }
         }
+        break;
 
       default:
         log.warning('Illegal starting version: $storedVersion');
@@ -262,13 +276,13 @@ class LocalStorePersistentStorage implements PersistentStorage {
 }
 
 /// Interface to migrate from one persistent storage to another
-abstract interface class PersistentStorageMigrator {
+abstract class PersistentStorageMigrator {
   /// Migrate data from one of the [migrationOptions] to the [toStorage]
   ///
   /// If migration took place, returns the name of the migration option,
   /// otherwise returns null
-  Future<String?> migrate(
-      List<String> migrationOptions, PersistentStorage toStorage);
+  Future<String?> migrate(List<String> migrationOptions,
+      PersistentStorage toStorage);
 }
 
 /// Migrates from [LocalStorePersistentStorage] to another [PersistentStorage]
@@ -298,8 +312,8 @@ class BasePersistentStorageMigrator implements PersistentStorageMigrator {
   /// This is the public interface to use in other [PersistentStorage]
   /// solutions.
   @override
-  Future<String?> migrate(
-      List<String> migrationOptions, PersistentStorage toStorage) async {
+  Future<String?> migrate(List<String> migrationOptions,
+      PersistentStorage toStorage) async {
     for (var persistentStorageName in migrationOptions) {
       try {
         if (await migrateFrom(persistentStorageName, toStorage)) {
@@ -320,12 +334,15 @@ class BasePersistentStorageMigrator implements PersistentStorageMigrator {
   ///
   /// If extending the class, add your mapping from a migration option String
   /// to a _migrateFrom... method that does your migration.
-  Future<bool> migrateFrom(
-          String persistentStorageName, PersistentStorage toStorage) =>
-      switch (persistentStorageName.toLowerCase().replaceAll('_', '')) {
-        'localstore' => migrateFromLocalStore(toStorage),
-        _ => Future.value(false)
-      };
+  Future<bool> migrateFrom(String persistentStorageName, PersistentStorage toStorage) async {
+  final lowerCaseName = persistentStorageName.toLowerCase().replaceAll('_', '');
+  if (lowerCaseName == 'localstore') {
+    return await migrateFromLocalStore(toStorage);
+  } else {
+    return false;
+  }
+}
+
 
   /// Migrate from a persistent storage to our database
   ///
@@ -333,8 +350,8 @@ class BasePersistentStorageMigrator implements PersistentStorageMigrator {
   ///
   /// This is a generic migrator that copies from one storage to another, and
   /// is used by the _migrateFrom... methods
-  Future<bool> migrateFromPersistentStorage(
-      PersistentStorage fromStorage, PersistentStorage toStorage) async {
+  Future<bool> migrateFromPersistentStorage(PersistentStorage fromStorage,
+      PersistentStorage toStorage) async {
     bool migratedSomething = false;
     await fromStorage.initialize();
     for (final pausedTask in await fromStorage.retrieveAllPausedTasks()) {

@@ -6,7 +6,7 @@ part of 'localstore.dart';
 /// The document at the referenced location may or may not exist.
 /// A [DocumentRef] can also be used to create a [CollectionRef]
 /// to a subcollection.
-final class DocumentRef implements DocumentRefImpl {
+class DocumentRef implements DocumentRefImpl {
   String _id;
 
   /// This document's given ID within the collection.

@@ -15,7 +15,7 @@ enum PermissionType {
 enum PermissionStatus { undetermined, denied, granted, partial, requestError }
 
 /// Developer visible interface to the PermissionService
-abstract interface class Permissions {
+abstract class Permissions {
   /// Request a permission; returns the [PermissionStatus]
   ///
   /// Ensure that only one request is being handled at the same time,
@@ -31,7 +31,7 @@ abstract interface class Permissions {
 }
 
 /// Basic implementation of the PermissionsService
-base class PermissionsService implements Permissions {
+class PermissionsService implements Permissions {
   final log = Logger("PermissionService");
 
   PermissionsService();
@@ -65,7 +65,7 @@ base class PermissionsService implements Permissions {
   void onPermissionRequestResult(PermissionStatus permissionStatus) {}
 }
 
-final class IOSPermissionsService extends PermissionsService {
+class IOSPermissionsService extends PermissionsService {
   IOSPermissionsService();
 
   @override
@@ -87,7 +87,7 @@ final class IOSPermissionsService extends PermissionsService {
   }
 }
 
-final class AndroidPermissionsService extends IOSPermissionsService {
+class AndroidPermissionsService extends IOSPermissionsService {
   Completer<PermissionStatus>? permissionStatusCompleter;
 
   @override

@@ -7,7 +7,7 @@ import 'package:background_downloader/background_downloader.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-final class TestTaskQueue extends MemoryTaskQueue {
+class TestTaskQueue extends MemoryTaskQueue {
   double probFailure = 0;
 
   @override

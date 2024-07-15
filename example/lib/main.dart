@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
   TaskStatus? downloadTaskStatus;
   DownloadTask? backgroundDownloadTask;
   StreamController<TaskProgressUpdate> progressUpdateStream =
-      StreamController();
+  StreamController();
 
   bool loadAndOpenInProgress = false;
   bool loadABunchInProgress = false;
@@ -63,53 +63,54 @@ class _MyAppState extends State<MyApp> {
     // Registering a callback and configure notifications
     FileDownloader()
         .registerCallbacks(
-            taskNotificationTapCallback: myNotificationTapCallback)
+        taskNotificationTapCallback: myNotificationTapCallback)
         .configureNotificationForGroup(FileDownloader.defaultGroup,
-            // For the main download button
-            // which uses 'enqueue' and a default group
-            running: const TaskNotification('Download {filename}',
-                'File: {filename} - {progress} - speed {networkSpeed} and {timeRemaining} remaining'),
-            complete: const TaskNotification(
-                '{displayName} download {filename}', 'Download complete'),
-            error: const TaskNotification(
-                'Download {filename}', 'Download failed'),
-            paused: const TaskNotification(
-                'Download {filename}', 'Paused with metadata {metadata}'),
-            progressBar: true)
+        // For the main download button
+        // which uses 'enqueue' and a default group
+        running: const TaskNotification('Download {filename}',
+            'File: {filename} - {progress} - speed {networkSpeed} and {timeRemaining} remaining'),
+        complete: const TaskNotification(
+            '{displayName} download {filename}', 'Download complete'),
+        error: const TaskNotification(
+            'Download {filename}', 'Download failed'),
+        paused: const TaskNotification(
+            'Download {filename}', 'Paused with metadata {metadata}'),
+        progressBar: true)
         .configureNotificationForGroup('bunch',
-            running: const TaskNotification(
-                '{numFinished} out of {numTotal}', 'Progress = {progress}'),
-            complete:
-                const TaskNotification("Done!", "Loaded {numTotal} files"),
-            error: const TaskNotification(
-                'Error', '{numFailed}/{numTotal} failed'),
-            progressBar: false,
-            groupNotificationId: 'notGroup')
+        running: const TaskNotification(
+            '{numFinished} out of {numTotal}', 'Progress = {progress}'),
+        complete:
+        const TaskNotification("Done!", "Loaded {numTotal} files"),
+        error: const TaskNotification(
+            'Error', '{numFailed}/{numTotal} failed'),
+        progressBar: false,
+        groupNotificationId: 'notGroup')
         .configureNotification(
-            // for the 'Download & Open' dog picture
-            // which uses 'download' which is not the .defaultGroup
-            // but the .await group so won't use the above config
-            complete: const TaskNotification(
-                'Download {filename}', 'Download complete'),
-            tapOpensFile: true); // dog can also open directly from tap
+      // for the 'Download & Open' dog picture
+      // which uses 'download' which is not the .defaultGroup
+      // but the .await group so won't use the above config
+        complete: const TaskNotification(
+            'Download {filename}', 'Download complete'),
+        tapOpensFile: true); // dog can also open directly from tap
 
     // Listen to updates and process
     FileDownloader().updates.listen((update) {
-      switch (update) {
-        case TaskStatusUpdate():
-          if (update.task == backgroundDownloadTask) {
-            buttonState = switch (update.status) {
-              TaskStatus.running || TaskStatus.enqueued => ButtonState.pause,
-              TaskStatus.paused => ButtonState.resume,
-              _ => ButtonState.reset
-            };
-            setState(() {
-              downloadTaskStatus = update.status;
-            });
+      if (update is TaskStatusUpdate) {
+        if (update.task == backgroundDownloadTask) {
+          if (update.status == TaskStatus.running ||
+              update.status == TaskStatus.enqueued) {
+            buttonState = ButtonState.pause;
+          } else if (update.status == TaskStatus.paused) {
+            buttonState = ButtonState.resume;
+          } else {
+            buttonState = ButtonState.reset;
           }
-
-        case TaskProgressUpdate():
-          progressUpdateStream.add(update); // pass on to widget for indicator
+          setState(() {
+            downloadTaskStatus = update.status;
+          });
+        }
+      } else if (update is TaskProgressUpdate) {
+        progressUpdateStream.add(update); // pass on to widget for indicator
       }
     });
   }
@@ -138,87 +139,94 @@ class _MyAppState extends State<MyApp> {
           ),
           body: Center(
               child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text('RequireWiFi setting',
-                          style: Theme.of(context).textTheme.titleLarge),
-                      const RequireWiFiChoice(),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Text('Force error',
-                              style: Theme.of(context).textTheme.titleLarge)),
-                      Switch(
-                          value: downloadWithError,
-                          onChanged: (value) {
-                            setState(() {
-                              downloadWithError = value;
-                            });
-                          })
-                    ],
-                  ),
-                ),
-                Center(
-                    child: ElevatedButton(
-                  onPressed: processButtonPress,
-                  child: Text(
-                    buttonTexts[buttonState.index],
-                  ),
-                )),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      const Expanded(child: Text('File download status:')),
-                      Text('${downloadTaskStatus ?? "undefined"}')
-                    ],
-                  ),
-                ),
-                const Divider(
-                  height: 30,
-                  thickness: 5,
-                  color: Colors.blueGrey,
-                ),
-                Center(
-                    child: ElevatedButton(
-                        onPressed:
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Text('RequireWiFi setting',
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .titleLarge),
+                          const RequireWiFiChoice(),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                              child: Text('Force error',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .titleLarge)),
+                          Switch(
+                              value: downloadWithError,
+                              onChanged: (value) {
+                                setState(() {
+                                  downloadWithError = value;
+                                });
+                              })
+                        ],
+                      ),
+                    ),
+                    Center(
+                        child: ElevatedButton(
+                          onPressed: processButtonPress,
+                          child: Text(
+                            buttonTexts[buttonState.index],
+                          ),
+                        )),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          const Expanded(child: Text('File download status:')),
+                          Text('${downloadTaskStatus ?? "undefined"}')
+                        ],
+                      ),
+                    ),
+                    const Divider(
+                      height: 30,
+                      thickness: 5,
+                      color: Colors.blueGrey,
+                    ),
+                    Center(
+                        child: ElevatedButton(
+                            onPressed:
                             loadAndOpenInProgress ? null : processLoadAndOpen,
-                        child: Text(
-                          Platform.isIOS
-                              ? 'Load, open and add'
-                              : Platform.isAndroid
+                            child: Text(
+                              Platform.isIOS
+                                  ? 'Load, open and add'
+                                  : Platform.isAndroid
                                   ? 'Load, open and move'
                                   : 'Load & Open',
-                        ))),
-                Center(
-                    child: Text(
-                  loadAndOpenInProgress ? 'Busy' : '',
-                )),
-                const Divider(
-                  height: 30,
-                  thickness: 5,
-                  color: Colors.blueGrey,
-                ),
-                Center(
-                    child: ElevatedButton(
-                        onPressed:
+                            ))),
+                    Center(
+                        child: Text(
+                          loadAndOpenInProgress ? 'Busy' : '',
+                        )),
+                    const Divider(
+                      height: 30,
+                      thickness: 5,
+                      color: Colors.blueGrey,
+                    ),
+                    Center(
+                        child: ElevatedButton(
+                            onPressed:
                             loadABunchInProgress ? null : processLoadABunch,
-                        child: const Text('Load a bunch'))),
-                Center(child: Text(loadABunchInProgress ? 'Enqueueing' : '')),
-              ],
-            ),
-          )),
+                            child: const Text('Load a bunch'))),
+                    Center(
+                        child: Text(loadABunchInProgress ? 'Enqueueing' : '')),
+                  ],
+                ),
+              )),
           bottomSheet: DownloadProgressIndicator(progressUpdateStream.stream,
               showPauseButton: true,
               showCancelButton: true,
@@ -232,7 +240,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> processButtonPress() async {
     switch (buttonState) {
       case ButtonState.download:
-        // start download
+      // start download
         await getPermission(PermissionType.notifications);
         backgroundDownloadTask = DownloadTask(
             url: downloadWithError
@@ -249,7 +257,7 @@ class _MyAppState extends State<MyApp> {
         await FileDownloader().enqueue(backgroundDownloadTask!);
         break;
       case ButtonState.cancel:
-        // cancel download
+      // cancel download
         if (backgroundDownloadTask != null) {
           await FileDownloader()
               .cancelTasksWithIds([backgroundDownloadTask!.taskId]);
@@ -283,7 +291,7 @@ class _MyAppState extends State<MyApp> {
       await getPermission(PermissionType.notifications);
       var task = DownloadTask(
           url:
-              'https://i2.wp.com/www.skiptomylou.org/wp-content/uploads/2019/06/dog-drawing.jpg',
+          'https://i2.wp.com/www.skiptomylou.org/wp-content/uploads/2019/06/dog-drawing.jpg',
           baseDirectory: BaseDirectory.applicationSupport,
           filename: 'dog.jpg');
       setState(() {
@@ -309,7 +317,8 @@ class _MyAppState extends State<MyApp> {
             final path = await FileDownloader()
                 .pathInSharedStorage(identifier, SharedStorage.images);
             debugPrint(
-                'iOS path to dog picture in Photos Library = ${path ?? "permission denied"}');
+                'iOS path to dog picture in Photos Library = ${path ??
+                    "permission denied"}');
           } else {
             debugPrint(
                 'Could not add file to Photos Library, likely because permission denied');
@@ -334,7 +343,8 @@ class _MyAppState extends State<MyApp> {
           final path = await FileDownloader()
               .moveToSharedStorage(task, SharedStorage.images);
           debugPrint(
-              'Android path to dog picture in .images = ${path ?? "permission denied"}');
+              'Android path to dog picture in .images = ${path ??
+                  "permission denied"}');
         } else {
           debugPrint('androidSharedStorage permission not granted');
         }
@@ -354,7 +364,7 @@ class _MyAppState extends State<MyApp> {
       for (var i = 0; i < 5; i++) {
         await FileDownloader().enqueue(DownloadTask(
             url:
-                'https://storage.googleapis.com/approachcharts/test/5MB-test.ZIP',
+            'https://storage.googleapis.com/approachcharts/test/5MB-test.ZIP',
             filename: 'File_${Random().nextInt(1000)}',
             group: 'bunch',
             updates: Updates.progress)); // must provide progress updates!

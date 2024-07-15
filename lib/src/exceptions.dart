@@ -16,7 +16,7 @@ const _exceptions = {
 /// exception message, or from the plugin. The localization is undefined
 /// For the [TaskHttpException], the [httpResponseCode] is only valid if >0
 /// and may offer details about the nature of the error
-base class TaskException implements Exception {
+class TaskException implements Exception {
   final String description;
 
   TaskException(this.description);
@@ -66,7 +66,7 @@ base class TaskException implements Exception {
 
 /// Exception related to the filesystem, e.g. insufficient space
 /// or file not found
-final class TaskFileSystemException extends TaskException {
+class TaskFileSystemException extends TaskException {
   TaskFileSystemException(super.description);
 
   @override
@@ -74,7 +74,7 @@ final class TaskFileSystemException extends TaskException {
 }
 
 /// Exception related to the url, eg malformed
-final class TaskUrlException extends TaskException {
+class TaskUrlException extends TaskException {
   TaskUrlException(super.description);
 
   @override
@@ -83,7 +83,7 @@ final class TaskUrlException extends TaskException {
 
 /// Exception related to the connection, e.g. socket exception
 /// or request timeout
-final class TaskConnectionException extends TaskException {
+class TaskConnectionException extends TaskException {
   TaskConnectionException(super.description);
 
   @override
@@ -92,7 +92,7 @@ final class TaskConnectionException extends TaskException {
 
 /// Exception related to an attempt to resume a task, e.g.
 /// the temp filename no longer exists, or eTag has changed
-final class TaskResumeException extends TaskException {
+class TaskResumeException extends TaskException {
   TaskResumeException(super.description);
 
   @override
@@ -101,7 +101,7 @@ final class TaskResumeException extends TaskException {
 
 /// Exception related to the HTTP response, e.g. a 403
 /// response code
-final class TaskHttpException extends TaskException {
+class TaskHttpException extends TaskException {
   final int httpResponseCode;
 
   TaskHttpException(super.description, this.httpResponseCode);

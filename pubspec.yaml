@@ -5,8 +5,10 @@ version: 8.5.2
 repository: https://github.com/781flyingdutchman/background_downloader
 
 environment:
-  sdk: ^3.0.0
-  flutter:  '>=3.0.0'
+#  sdk: ^3.0.0
+#  flutter:  '>=3.0.0'
+  sdk: '>=2.19.0 <=4.0.0'
+  flutter: '>=3.7.12-ohos'
 
 dependencies:
   flutter:
@@ -29,9 +31,16 @@ platforms:
   ios:
   linux:
   macos:
-  windows:
+#  windows:
+  ohos:
 
-
+dependency_overrides:
+  path_provider:
+    git:
+      url: https://gitee.com/openharmony-sig/flutter_packages.git
+      path: packages/path_provider/path_provider
+  http: ^0.13.6
+  flutter_lints: ^2.0.1
 flutter:
   plugin:
     platforms:

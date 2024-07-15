@@ -3,13 +3,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:logging/logging.dart';
+
 import '../localstore.dart';
 import 'utils_impl.dart';
-import 'package:logging/logging.dart';
 
 final _log = Logger('Localstore');
 
-final class Utils implements UtilsImpl {
+class Utils implements UtilsImpl {
   Utils._();
 
   static final Utils _utils = Utils._();

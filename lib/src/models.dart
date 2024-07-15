@@ -177,7 +177,7 @@ class Batch {
 /// When receiving an update, test if the update is a
 /// [TaskStatusUpdate] or a [TaskProgressUpdate]
 /// and treat the update accordingly
-sealed class TaskUpdate {
+class TaskUpdate {
   final Task task;
 
   const TaskUpdate(this.task);
@@ -326,21 +326,28 @@ class TaskProgressUpdate extends TaskUpdate {
   bool get hasTimeRemaining => !timeRemaining.isNegative;
 
   /// String is '-- MB/s' if N/A, otherwise in MB/s or kB/s
-  String get networkSpeedAsString => switch (networkSpeed) {
-        <= 0 => '-- MB/s',
-        >= 1 => '${networkSpeed.round()} MB/s',
-        _ => '${(networkSpeed * 1000).round()} kB/s'
-      };
+  String get networkSpeedAsString {
+    if (networkSpeed <= 0) {
+      return '-- MB/s';
+    }
+    if (networkSpeed >= 1) {
+      return '${networkSpeed.round()} MB/s';
+    }
+    return '${(networkSpeed * 1000).round()} kB/s';
+  }
 
-  /// String is '--:--' if N/A, otherwise HH:MM:SS or MM:SS
-  String get timeRemainingAsString => switch (timeRemaining.inSeconds) {
-        <= 0 => '--:--',
-        < 3600 => '${timeRemaining.inMinutes.toString().padLeft(2, "0")}'
-            ':${timeRemaining.inSeconds.remainder(60).toString().padLeft(2, "0")}',
-        _ => '${timeRemaining.inHours}'
-            ':${timeRemaining.inMinutes.remainder(60).toString().padLeft(2, "0")}'
-            ':${timeRemaining.inSeconds.remainder(60).toString().padLeft(2, "0")}'
-      };
+  String get timeRemainingAsString {
+    if (timeRemaining.inSeconds <= 0) {
+      return '--:--';
+    } else if (timeRemaining.inSeconds <= 3600) {
+      return '${timeRemaining.inMinutes.toString().padLeft(2, "0")}'
+          ':${timeRemaining.inSeconds.remainder(60).toString().padLeft(2, "0")}';
+    } else {
+      return '${timeRemaining.inHours}'
+          ':${timeRemaining.inMinutes.remainder(60).toString().padLeft(2, "0")}'
+          ':${timeRemaining.inSeconds.remainder(60).toString().padLeft(2, "0")}';
+    }
+  }
 
   @override
   String toString() {
@@ -427,7 +434,7 @@ enum NotificationType { running, complete, error, paused }
 ///
 /// Actual appearance of notification is dependent on the platform, e.g.
 /// on iOS {progress} is not available and ignored
-final class TaskNotification {
+class TaskNotification {
   final String title;
   final String body;
 
@@ -459,7 +466,7 @@ final class TaskNotification {
 ///    [complete] notification is shown (if configured). If any task in the
 ///    groupNotification fails, the [error] notification is shown.
 ///    The first character of the [groupNotificationId] cannot be '*'.
-final class TaskNotificationConfig {
+class TaskNotificationConfig {
   final dynamic taskOrGroup;
   final TaskNotification? running;
   final TaskNotification? complete;
@@ -539,7 +546,7 @@ enum SharedStorage {
   external
 }
 
-final class Config {
+class Config {
   // Config topics
   static const requestTimeout = 'requestTimeout';
   static const resourceTimeout = 'resourceTimeout';

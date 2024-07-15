@@ -2,7 +2,7 @@ part of 'localstore.dart';
 
 /// An options class that configures the behavior of set() calls in
 /// [DocumentRef].
-final class SetOptions {
+class SetOptions {
   final bool _merge;
 
   /// Changes the behavior of a set() call to only replace the values specified

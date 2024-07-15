@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 
@@ -9,13 +10,14 @@ final _log = Logger('FileDownloader');
 
 /// Return url String composed of the [url] and the
 /// [urlQueryParameters], if given
-String urlWithQueryParameters(
-    String url, Map<String, String>? urlQueryParameters) {
+String urlWithQueryParameters(String url,
+    Map<String, String>? urlQueryParameters) {
   if (urlQueryParameters == null || urlQueryParameters.isEmpty) {
     return url;
   }
   final separator = url.contains('?') ? '&' : '?';
-  return '$url$separator${urlQueryParameters.entries.map((e) => '${e.key}=${e.value}').join('&')}';
+  return '$url$separator${urlQueryParameters.entries.map((e) => '${e.key}=${e
+      .value}').join('&')}';
 }
 
 /// Parses the range in a Range header, and returns a Pair representing
@@ -48,20 +50,22 @@ int getContentLength(Map<String, String> responseHeaders, Task task) {
   // try extracting it from Range header
   final taskRangeHeader = task.headers['Range'] ?? task.headers['range'] ?? '';
   final taskRange = parseRange(taskRangeHeader);
-  if (taskRange.$2 != null) {
-    var rangeLength = taskRange.$2! - taskRange.$1 + 1;
+  if (taskRange.$1 != null) {
+    var rangeLength = taskRange.$1! - taskRange.$0 + 1;
     _log.finest(
-        'TaskId ${task.taskId} contentLength set to $rangeLength based on Range header');
+        'TaskId ${task
+            .taskId} contentLength set to $rangeLength based on Range header');
     return rangeLength;
   }
   // try extracting it from a special "Known-Content-Length" header
   var knownLength = int.tryParse(task.headers['Known-Content-Length'] ??
-          task.headers['known-content-length'] ??
-          '-1') ??
+      task.headers['known-content-length'] ??
+      '-1') ??
       -1;
   if (knownLength != -1) {
     _log.finest(
-        'TaskId ${task.taskId} contentLength set to $knownLength based on Known-Content-Length header');
+        'TaskId ${task
+            .taskId} contentLength set to $knownLength based on Known-Content-Length header');
   } else {
     _log.finest('TaskId ${task.taskId} contentLength undetermined');
   }
@@ -79,8 +83,8 @@ int getContentLength(Map<String, String> responseHeaders, Task task) {
 /// The server-suggested filename is obtained from the  [responseHeaders] entry
 /// "Content-Disposition" according to RFC6266, or the last path segment of the
 /// URL, or leaves the filename unchanged
-Future<DownloadTask> taskWithSuggestedFilename(
-    DownloadTask task, Map<String, String> responseHeaders, bool unique) {
+Future<DownloadTask> taskWithSuggestedFilename(DownloadTask task,
+    Map<String, String> responseHeaders, bool unique) {
   /// Returns [DownloadTask] with a filename similar to the one
   /// supplied, but unused.
   ///
@@ -101,8 +105,10 @@ Future<DownloadTask> taskWithSuggestedFilename(
       final match = sequenceRegEx.firstMatch(newTask.filename);
       final newSequence = int.parse(match?.group(1) ?? "0") + 1;
       final newFilename = match == null
-          ? '${path.basenameWithoutExtension(newTask.filename)} ($newSequence)$extension'
-          : '${newTask.filename.substring(0, match.start - 1)} ($newSequence)$extension';
+          ? '${path.basenameWithoutExtension(
+          newTask.filename)} ($newSequence)$extension'
+          : '${newTask.filename.substring(
+          0, match.start - 1)} ($newSequence)$extension';
       newTask = newTask.copyWith(filename: newFilename);
       filePath = await newTask.filePath();
       exists = await File(filePath).exists();
@@ -122,8 +128,12 @@ Future<DownloadTask> taskWithSuggestedFilename(
         caseSensitive: false);
     var match = encodedFilenameRegEx.firstMatch(disposition);
     if (match != null &&
-        match.group(1)?.isNotEmpty == true &&
-        match.group(3)?.isNotEmpty == true) {
+        match
+            .group(1)
+            ?.isNotEmpty == true &&
+        match
+            .group(3)
+            ?.isNotEmpty == true) {
       try {
         final suggestedFilename = match.group(1)?.toUpperCase() == 'UTF-8'
             ? Uri.decodeComponent(match.group(3)!)
@@ -132,25 +142,46 @@ Future<DownloadTask> taskWithSuggestedFilename(
             task.copyWith(filename: suggestedFilename), unique);
       } on ArgumentError {
         _log.finest(
-            'Could not interpret suggested filename (UTF-8 url encoded) ${match.group(3)}');
+            'Could not interpret suggested filename (UTF-8 url encoded) ${match
+                .group(3)}');
       }
     }
     // Try filename="filename"
     final plainFilenameRegEx =
-        RegExp(r'filename=\s*"?([^"]+)"?.*$', caseSensitive: false);
+    RegExp(r'filename=\s*"?([^"]+)"?.*$', caseSensitive: false);
     match = plainFilenameRegEx.firstMatch(disposition);
-    if (match != null && match.group(1)?.isNotEmpty == true) {
+    if (match != null && match
+        .group(1)
+        ?.isNotEmpty == true) {
       return uniqueFilename(task.copyWith(filename: match.group(1)), unique);
     }
   } catch (_) {}
   _log.finest('Could not determine suggested filename from server');
   // Try filename derived from last path segment of the url
   try {
-    final suggestedFilename = Uri.parse(task.url).pathSegments.last;
+    final suggestedFilename = Uri
+        .parse(task.url)
+        .pathSegments
+        .last;
     return uniqueFilename(task.copyWith(filename: suggestedFilename), unique);
   } catch (_) {}
   _log.finest('Could not parse URL pathSegment for suggested filename');
   // if everything fails, return the task with unchanged filename
   // except for possibly making it unique
   return uniqueFilename(task, unique);
+}
+
+
+extension ListExtensions<T> on Iterable<T>? {
+  /// Validate given List is not null and returns blank list if null.
+  /// This should not be used to clear list
+  T? find(int index, [dynamic defaultValue]) {
+    if (this == null) {
+      return defaultValue;
+    }
+    if (index < 0 || index >= this!.length) {
+      return defaultValue;
+    }
+    return this?.elementAt(index) ?? defaultValue;
+  }
 }

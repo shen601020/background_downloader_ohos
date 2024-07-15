@@ -15,10 +15,10 @@ import 'models.dart';
 import 'persistent_storage.dart';
 import 'task.dart';
 import 'web_downloader.dart'
-    if (dart.library.io) 'desktop/desktop_downloader.dart';
+if (dart.library.io) 'desktop/desktop_downloader.dart';
 
 /// Provides access to all functions of the plugin in a single place.
-interface class FileDownloader {
+class FileDownloader {
   static FileDownloader? _singleton;
 
   /// If no group is specified the default group name will be used
@@ -50,8 +50,8 @@ interface class FileDownloader {
 
   factory FileDownloader({PersistentStorage? persistentStorage}) {
     assert(
-        _singleton == null || persistentStorage == null,
-        'You can only supply a persistentStorage on the very first call to '
+    _singleton == null || persistentStorage == null,
+    'You can only supply a persistentStorage on the very first call to '
         'FileDownloader()');
     _singleton ??= FileDownloader._internal(
         persistentStorage ?? LocalStorePersistentStorage());
@@ -87,11 +87,10 @@ interface class FileDownloader {
   ///
   /// Please see [CONFIG.md](https://github.com/781flyingdutchman/background_downloader/blob/main/CONFIG.md)
   /// for more information
-  Future<List<(String, String)>> configure(
-          {dynamic globalConfig,
-          dynamic androidConfig,
-          dynamic iOSConfig,
-          dynamic desktopConfig}) =>
+  Future<List<(String, String)>> configure({dynamic globalConfig,
+    dynamic androidConfig,
+    dynamic iOSConfig,
+    dynamic desktopConfig}) =>
       _downloader.configure(
           globalConfig: globalConfig,
           androidConfig: androidConfig,
@@ -121,16 +120,15 @@ interface class FileDownloader {
   /// is used when calling 'convenience' functions like `FileDownloader().download`
   ///
   /// The call returns the [FileDownloader] to make chaining easier
-  FileDownloader registerCallbacks(
-      {String group = defaultGroup,
-      TaskStatusCallback? taskStatusCallback,
-      TaskProgressCallback? taskProgressCallback,
-      TaskNotificationTapCallback? taskNotificationTapCallback}) {
+  FileDownloader registerCallbacks({String group = defaultGroup,
+    TaskStatusCallback? taskStatusCallback,
+    TaskProgressCallback? taskProgressCallback,
+    TaskNotificationTapCallback? taskNotificationTapCallback}) {
     assert(
-        taskStatusCallback != null ||
-            taskProgressCallback != null ||
-            taskNotificationTapCallback != null,
-        'Must provide at least one callback');
+    taskStatusCallback != null ||
+        taskProgressCallback != null ||
+        taskNotificationTapCallback != null,
+    'Must provide at least one callback');
     if (taskStatusCallback != null) {
       _downloader.groupStatusCallbacks[group] = taskStatusCallback;
     }
@@ -233,10 +231,10 @@ interface class FileDownloader {
   /// - you want more detailed progress information
   ///   (e.g. file size, network speed, time remaining)
   Future<TaskStatusUpdate> download(DownloadTask task,
-          {void Function(TaskStatus)? onStatus,
-          void Function(double)? onProgress,
-          void Function(Duration)? onElapsedTime,
-          Duration? elapsedTimeInterval}) =>
+      {void Function(TaskStatus)? onStatus,
+        void Function(double)? onProgress,
+        void Function(Duration)? onElapsedTime,
+        Duration? elapsedTimeInterval}) =>
       _downloader.enqueueAndAwait(task,
           onStatus: onStatus,
           onProgress: onProgress,
@@ -279,10 +277,10 @@ interface class FileDownloader {
   /// - you want more detailed progress information
   ///   (e.g. file size, network speed, time remaining)
   Future<TaskStatusUpdate> upload(UploadTask task,
-          {void Function(TaskStatus)? onStatus,
-          void Function(double)? onProgress,
-          void Function(Duration)? onElapsedTime,
-          Duration? elapsedTimeInterval}) =>
+      {void Function(TaskStatus)? onStatus,
+        void Function(double)? onProgress,
+        void Function(Duration)? onElapsedTime,
+        Duration? elapsedTimeInterval}) =>
       _downloader.enqueueAndAwait(task,
           onStatus: onStatus,
           onProgress: onProgress,
@@ -307,9 +305,9 @@ interface class FileDownloader {
   /// For performance reasons the [elapsedTimeInterval] should not be set to
   /// a value less than one second.
   Future<TaskStatusUpdate> transmit(DataTask task,
-          {void Function(TaskStatus)? onStatus,
-          void Function(Duration)? onElapsedTime,
-          Duration? elapsedTimeInterval}) =>
+      {void Function(TaskStatus)? onStatus,
+        void Function(Duration)? onElapsedTime,
+        Duration? elapsedTimeInterval}) =>
       _downloader.enqueueAndAwait(task,
           onStatus: onStatus,
           onElapsedTime: onElapsedTime,
@@ -345,11 +343,11 @@ interface class FileDownloader {
   /// those modified tasks are returned as part of the [Batch]
   /// object.
   Future<Batch> downloadBatch(final List<DownloadTask> tasks,
-          {BatchProgressCallback? batchProgressCallback,
-          TaskStatusCallback? taskStatusCallback,
-          TaskProgressCallback? taskProgressCallback,
-          void Function(Duration)? onElapsedTime,
-          Duration? elapsedTimeInterval}) =>
+      {BatchProgressCallback? batchProgressCallback,
+        TaskStatusCallback? taskStatusCallback,
+        TaskProgressCallback? taskProgressCallback,
+        void Function(Duration)? onElapsedTime,
+        Duration? elapsedTimeInterval}) =>
       _downloader.enqueueAndAwaitBatch(tasks,
           batchProgressCallback: batchProgressCallback,
           taskStatusCallback: taskStatusCallback,
@@ -387,11 +385,11 @@ interface class FileDownloader {
   /// those modified tasks are returned as part of the [Batch]
   /// object.
   Future<Batch> uploadBatch(final List<UploadTask> tasks,
-          {BatchProgressCallback? batchProgressCallback,
-          TaskStatusCallback? taskStatusCallback,
-          TaskProgressCallback? taskProgressCallback,
-          void Function(Duration)? onElapsedTime,
-          Duration? elapsedTimeInterval}) =>
+      {BatchProgressCallback? batchProgressCallback,
+        TaskStatusCallback? taskStatusCallback,
+        TaskProgressCallback? taskProgressCallback,
+        void Function(Duration)? onElapsedTime,
+        Duration? elapsedTimeInterval}) =>
       _downloader.enqueueAndAwaitBatch(tasks,
           batchProgressCallback: batchProgressCallback,
           taskStatusCallback: taskStatusCallback,
@@ -417,12 +415,11 @@ interface class FileDownloader {
   ///
   /// This method acts on a [group] of tasks. If omitted, the [defaultGroup]
   /// is used, which is the group used when you [enqueue] a task
-  Future<List<String>> allTaskIds(
-          {String group = defaultGroup,
-          bool includeTasksWaitingToRetry = true}) async =>
+  Future<List<String>> allTaskIds({String group = defaultGroup,
+    bool includeTasksWaitingToRetry = true}) async =>
       (await allTasks(
-              group: group,
-              includeTasksWaitingToRetry: includeTasksWaitingToRetry))
+          group: group,
+          includeTasksWaitingToRetry: includeTasksWaitingToRetry))
           .map((task) => task.taskId)
           .toList();
 
@@ -433,9 +430,8 @@ interface class FileDownloader {
   ///
   /// This method acts on a [group] of tasks. If omitted, the [defaultGroup]
   /// is used, which is the group used when you [enqueue] a task.
-  Future<List<Task>> allTasks(
-          {String group = defaultGroup,
-          bool includeTasksWaitingToRetry = true}) =>
+  Future<List<Task>> allTasks({String group = defaultGroup,
+    bool includeTasksWaitingToRetry = true}) =>
       _downloader.allTasks(group, includeTasksWaitingToRetry);
 
   /// Returns true if tasks in this [group] are finished
@@ -454,10 +450,9 @@ interface class FileDownloader {
   /// be returned by the platform as 'active', but you already know it is not.
   /// Calling [tasksFinished] while passing that just-finished task will ensure
   /// a proper test in that situation.
-  Future<bool> tasksFinished(
-      {String group = defaultGroup,
-      bool includeTasksWaitingToRetry = true,
-      String? ignoreTaskId}) async {
+  Future<bool> tasksFinished({String group = defaultGroup,
+    bool includeTasksWaitingToRetry = true,
+    String? ignoreTaskId}) async {
     final tasksInProgress = await allTasks(
         group: group, includeTasksWaitingToRetry: includeTasksWaitingToRetry);
     if (ignoreTaskId != null) {
@@ -579,7 +574,7 @@ interface class FileDownloader {
   /// Reschedules running tasks if [rescheduleRunningTasks] is true,
   /// otherwise leaves those running with their prior setting
   Future<bool> requireWiFi(RequireWiFi requirement,
-          {final rescheduleRunningTasks = true}) =>
+      {final rescheduleRunningTasks = true}) =>
       _downloader.requireWiFi(requirement, rescheduleRunningTasks);
 
   /// Returns the current global setting for requiring WiFi
@@ -630,12 +625,12 @@ interface class FileDownloader {
   /// Returns the [FileDownloader] for easy chaining
   FileDownloader configureNotificationForTask(Task task,
       {TaskNotification? running,
-      TaskNotification? complete,
-      TaskNotification? error,
-      TaskNotification? paused,
-      bool progressBar = false,
-      bool tapOpensFile = false,
-      String groupNotificationId = ''}) {
+        TaskNotification? complete,
+        TaskNotification? error,
+        TaskNotification? paused,
+        bool progressBar = false,
+        bool tapOpensFile = false,
+        String groupNotificationId = ''}) {
     _downloader.notificationConfigs.add(TaskNotificationConfig(
         taskOrGroup: task,
         running: running,
@@ -692,12 +687,12 @@ interface class FileDownloader {
   /// Returns the [FileDownloader] for easy chaining
   FileDownloader configureNotificationForGroup(String group,
       {TaskNotification? running,
-      TaskNotification? complete,
-      TaskNotification? error,
-      TaskNotification? paused,
-      bool progressBar = false,
-      bool tapOpensFile = false,
-      String groupNotificationId = ''}) {
+        TaskNotification? complete,
+        TaskNotification? error,
+        TaskNotification? paused,
+        bool progressBar = false,
+        bool tapOpensFile = false,
+        String groupNotificationId = ''}) {
     _downloader.notificationConfigs.add(TaskNotificationConfig(
         taskOrGroup: group,
         running: running,
@@ -752,14 +747,13 @@ interface class FileDownloader {
   /// on iOS {progress} is not available and ignored (except for groupNotifications)
   ///
   /// Returns the [FileDownloader] for easy chaining
-  FileDownloader configureNotification(
-      {TaskNotification? running,
-      TaskNotification? complete,
-      TaskNotification? error,
-      TaskNotification? paused,
-      bool progressBar = false,
-      bool tapOpensFile = false,
-      String groupNotificationId = ''}) {
+  FileDownloader configureNotification({TaskNotification? running,
+    TaskNotification? complete,
+    TaskNotification? error,
+    TaskNotification? paused,
+    bool progressBar = false,
+    bool tapOpensFile = false,
+    String groupNotificationId = ''}) {
     _downloader.notificationConfigs.add(TaskNotificationConfig(
         taskOrGroup: null,
         running: running,
@@ -789,11 +783,12 @@ interface class FileDownloader {
   /// the downloader. If not set, the default [http.Client] will be used.
   /// The request is executed on an Isolate, to ensure minimal interference
   /// with the main Isolate
-  Future<http.Response> request(Request request) => compute(_doRequest, (
-        request,
-        DesktopDownloader.requestTimeout,
-        DesktopDownloader.proxy,
-        DesktopDownloader.bypassTLSCertificateValidation
+  Future<http.Response> request(Request request) =>
+      compute(_doRequest, (
+      request,
+      DesktopDownloader.requestTimeout,
+      DesktopDownloader.proxy,
+      DesktopDownloader.bypassTLSCertificateValidation
       ));
 
   /// Move the file represented by the [task] to a shared storage
@@ -816,12 +811,11 @@ interface class FileDownloader {
   /// of the photo or video in the Photos Library.
   ///
   /// Platform-dependent, not consistent across all platforms
-  Future<String?> moveToSharedStorage(
-    DownloadTask task,
-    SharedStorage destination, {
-    String directory = '',
-    String? mimeType,
-  }) async =>
+  Future<String?> moveToSharedStorage(DownloadTask task,
+      SharedStorage destination, {
+        String directory = '',
+        String? mimeType,
+      }) async =>
       moveFileToSharedStorage(await task.filePath(), destination,
           directory: directory, mimeType: mimeType);
 
@@ -844,12 +838,11 @@ interface class FileDownloader {
   /// of the photo or video in the Photos Library.
   ///
   /// Platform-dependent, not consistent across all platforms
-  Future<String?> moveFileToSharedStorage(
-    String filePath,
-    SharedStorage destination, {
-    String directory = '',
-    String? mimeType,
-  }) async =>
+  Future<String?> moveFileToSharedStorage(String filePath,
+      SharedStorage destination, {
+        String directory = '',
+        String? mimeType,
+      }) async =>
       _downloader.moveToSharedStorage(
           filePath, destination, directory, mimeType);
 
@@ -863,9 +856,9 @@ interface class FileDownloader {
   /// on iOS for .images and .video
   ///
   /// Platform-dependent, not consistent across all platforms
-  Future<String?> pathInSharedStorage(
-          String filePath, SharedStorage destination,
-          {String directory = ''}) async =>
+  Future<String?> pathInSharedStorage(String filePath,
+      SharedStorage destination,
+      {String directory = ''}) async =>
       _downloader.pathInSharedStorage(filePath, destination, directory);
 
   /// Open the file represented by [task] or [filePath] using the application
@@ -878,7 +871,7 @@ interface class FileDownloader {
   Future<bool> openFile({Task? task, String? filePath, String? mimeType}) {
     assert(task != null || filePath != null, 'Task or filePath must be set');
     assert(!(task != null && filePath != null),
-        'Either task or filePath must be set, not both');
+    'Either task or filePath must be set, not both');
     return _downloader.openFile(task, filePath, mimeType);
   }
 
@@ -904,10 +897,62 @@ interface class FileDownloader {
 ///
 /// This function is run on an Isolate to ensure performance on the main
 /// Isolate is not affected
+// Future<http.Response> _doRequest(
+//     (Request, Duration?, Map<String, dynamic>, bool) params) async {
+//   final (request, requestTimeout, proxy, bypassTLSCertificateValidation) =
+//       params;
+//   Logger.root.level = Level.ALL;
+//   Logger.root.onRecord.listen((LogRecord rec) {
+//     if (kDebugMode) {
+//       print('${rec.loggerName}>${rec.level.name}: ${rec.time}: ${rec.message}');
+//     }
+//   });
+//   final log = Logger('FileDownloader.request');
+//   DesktopDownloader.setHttpClient(
+//       requestTimeout, proxy, bypassTLSCertificateValidation);
+//   final client = DesktopDownloader.httpClient;
+//   var response = http.Response('', 499,
+//       reasonPhrase: 'Not attempted'); // dummy to start with
+//   while (request.retriesRemaining >= 0) {
+//     try {
+//       response = await switch (request.httpRequestMethod) {
+//         'GET' => client.get(Uri.parse(request.url), headers: request.headers),
+//         'POST' => client.post(Uri.parse(request.url),
+//             headers: request.headers, body: request.post),
+//         'HEAD' => client.head(Uri.parse(request.url), headers: request.headers),
+//         'PUT' => client.put(Uri.parse(request.url), headers: request.headers),
+//         'DELETE' =>
+//           client.delete(Uri.parse(request.url), headers: request.headers),
+//         'PATCH' =>
+//           client.patch(Uri.parse(request.url), headers: request.headers),
+//         _ => Future.value(response)
+//       };
+//       if ([200, 201, 202, 203, 204, 205, 206, 404]
+//           .contains(response.statusCode)) {
+//         return response;
+//       }
+//     } catch (e) {
+//       log.warning(e);
+//       response = http.Response('', 499, reasonPhrase: e.toString());
+//     }
+//     // error, retry if allowed
+//     request.decreaseRetriesRemaining();
+//     if (request.retriesRemaining < 0) {
+//       return response; // final response with error
+//     }
+//     final waitTime = Duration(
+//         seconds: pow(2, (request.retries - request.retriesRemaining)).toInt());
+//     await Future.delayed(waitTime);
+//   }
+//   throw ArgumentError('Request to ${request.url} had no retries remaining');
+// }
 Future<http.Response> _doRequest(
     (Request, Duration?, Map<String, dynamic>, bool) params) async {
-  final (request, requestTimeout, proxy, bypassTLSCertificateValidation) =
-      params;
+  final request = params.$0;
+  final requestTimeout = params.$1;
+  final proxy = params.$2;
+  final bypassTLSCertificateValidation = params.$3;
+
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((LogRecord rec) {
     if (kDebugMode) {
@@ -922,20 +967,30 @@ Future<http.Response> _doRequest(
       reasonPhrase: 'Not attempted'); // dummy to start with
   while (request.retriesRemaining >= 0) {
     try {
-      response = await switch (request.httpRequestMethod) {
-        'GET' => client.get(Uri.parse(request.url), headers: request.headers),
-        'POST' => client.post(Uri.parse(request.url),
-            headers: request.headers, body: request.post),
-        'HEAD' => client.head(Uri.parse(request.url), headers: request.headers),
-        'PUT' => client.put(Uri.parse(request.url), headers: request.headers),
-        'DELETE' =>
-          client.delete(Uri.parse(request.url), headers: request.headers),
-        'PATCH' =>
-          client.patch(Uri.parse(request.url), headers: request.headers),
-        _ => Future.value(response)
-      };
-      if ([200, 201, 202, 203, 204, 205, 206, 404]
-          .contains(response.statusCode)) {
+      if (request.httpRequestMethod == 'GET') {
+        response =
+        await client.get(Uri.parse(request.url), headers: request.headers);
+      } else if (request.httpRequestMethod == 'POST') {
+        response = await client.post(
+            Uri.parse(request.url), headers: request.headers,
+            body: request.post);
+      } else if (request.httpRequestMethod == 'HEAD') {
+        response =
+        await client.head(Uri.parse(request.url), headers: request.headers);
+      } else if (request.httpRequestMethod == 'PUT') {
+        response =
+        await client.put(Uri.parse(request.url), headers: request.headers);
+      } else if (request.httpRequestMethod == 'DELETE') {
+        response =
+        await client.delete(Uri.parse(request.url), headers: request.headers);
+      } else if (request.httpRequestMethod == 'PATCH') {
+        response =
+        await client.patch(Uri.parse(request.url), headers: request.headers);
+      } else {
+        response = await Future.value(response);
+      }
+      if ([200, 201, 202, 203, 204, 205, 206, 404].contains(
+          response.statusCode)) {
         return response;
       }
     } catch (e) {

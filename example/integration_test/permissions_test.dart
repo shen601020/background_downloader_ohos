@@ -26,6 +26,7 @@ void main() {
           } else {
             expect(status, equals(PermissionStatus.granted));
           }
+          break;
         case PermissionType.androidSharedStorage:
           if (Platform.isAndroid) {
             final androidVersion = await getAndroidVersion();
@@ -37,12 +38,14 @@ void main() {
           } else {
             expect(status, equals(PermissionStatus.granted));
           }
+          break;
         case PermissionType.iosAddToPhotoLibrary:
           if (Platform.isIOS) {
             expect(status, equals(PermissionStatus.undetermined));
           } else {
             expect(status, equals(PermissionStatus.granted));
           }
+          break;
         case PermissionType.iosChangePhotoLibrary:
           if (Platform.isIOS) {
             expect(status, equals(PermissionStatus.undetermined));
@@ -72,6 +75,7 @@ void main() {
           } else {
             expect(status, equals(PermissionStatus.granted));
           }
+          break;
         case PermissionType.androidSharedStorage:
           if (Platform.isAndroid) {
             final androidVersion = await getAndroidVersion();
@@ -83,8 +87,10 @@ void main() {
           } else {
             expect(status, equals(PermissionStatus.granted));
           }
+          break;
         case PermissionType.iosAddToPhotoLibrary:
           expect(status, equals(PermissionStatus.granted));
+          break;
         case PermissionType.iosChangePhotoLibrary:
           expect(status, equals(PermissionStatus.granted));
       }

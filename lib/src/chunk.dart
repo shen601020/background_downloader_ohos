@@ -87,13 +87,17 @@ class Chunk {
       jsonDecode(task.metaData)['parentTaskId'] as String;
 
   /// Return [Updates] that is based on the [parentTask]
-  static Updates updatesBasedOnParent(Task parentTask) =>
-      switch (parentTask.updates) {
-        Updates.none || Updates.status => Updates.status,
-        Updates.progress ||
-        Updates.statusAndProgress =>
-          Updates.statusAndProgress
-      };
+  static Updates updatesBasedOnParent(Task parentTask) {
+    switch (parentTask.updates) {
+      case Updates.none:
+      case Updates.status:
+        return Updates.status;
+      case Updates.progress:
+      case Updates.statusAndProgress:
+        return Updates.statusAndProgress;
+    }
+    ;
+  }
 }
 
 /// Resume all chunk tasks associated with this [task], and

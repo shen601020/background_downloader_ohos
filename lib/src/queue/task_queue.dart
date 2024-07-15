@@ -8,7 +8,7 @@ import '../task.dart';
 
 /// Interface allowing the [FileDownloader] to signal finished tasks to
 /// a [TaskQueue]
-abstract interface class TaskQueue {
+abstract class TaskQueue {
   /// Signals that [task] has finished
   void taskFinished(Task task);
 }
