@@ -13,8 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'file_downloader.dart';
 import 'models.dart';
 import 'utils.dart';
-import 'web_downloader.dart'
-if (dart.library.io) 'desktop/desktop_downloader.dart';
+import 'web_downloader.dart';
 
 final _log = Logger('FileDownloader');
 

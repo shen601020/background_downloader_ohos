@@ -14,8 +14,7 @@ import 'localstore/localstore.dart';
 import 'models.dart';
 import 'persistent_storage.dart';
 import 'task.dart';
-import 'web_downloader.dart'
-if (dart.library.io) 'desktop/desktop_downloader.dart';
+import 'web_downloader.dart';
 
 /// Provides access to all functions of the plugin in a single place.
 class FileDownloader {
